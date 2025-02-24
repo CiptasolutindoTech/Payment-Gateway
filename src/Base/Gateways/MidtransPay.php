@@ -115,7 +115,7 @@ class MidtransPay extends PaymentGatewayBase
      * */
     public function ipn_response($args = []){
 
-        $midtrans_last_order_id = session()->get('midtrans_last_order_id');
+        $midtrans_last_order_id = (session()->get('midtrans_last_order_id')??request()->order_id);
         session()->forget('midtrans_last_order_id');
         if (empty($midtrans_last_order_id)){
             abort(405,'midtrans order missing');
