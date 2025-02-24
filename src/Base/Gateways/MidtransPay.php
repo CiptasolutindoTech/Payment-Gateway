@@ -129,9 +129,16 @@ class MidtransPay extends PaymentGatewayBase
         ]);
 
         $status = \Midtrans\Transaction::status($midtrans_last_order_id);
-        $status_message = Str::contains($status['status_message'],['Success']);
-        if (in_array($status['transaction_status'],  ['settlement','capture']) && $status['fraud_status'] === 'accept' && $status_message ){
-            return $this->verified_data(['transaction_id' => $status['transaction_id'],'order_id' => substr($midtrans_last_order_id,5,-5)]);
+        if ($status instanceof \stdClass) {
+            $status_message = Str::contains($status->status_message, ['Success']);
+            if (in_array($status->transaction_status, ['settlement', 'capture']) && $status->fraud_status === 'accept' && $status_message) {
+            return $this->verified_data(['transaction_id' => $status->transaction_id, 'order_id' => substr($midtrans_last_order_id, 5, -5)]);
+            }
+        } else {
+            $status_message = Str::contains($status['status_message'], ['Success']);
+            if (in_array($status['transaction_status'], ['settlement', 'capture']) && $status['fraud_status'] === 'accept' && $status_message) {
+            return $this->verified_data(['transaction_id' => $status['transaction_id'], 'order_id' => substr($midtrans_last_order_id, 5, -5)]);
+            }
         }
 
         abort(404);
